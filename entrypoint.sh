@@ -10,9 +10,9 @@ sleep 10
 rabbitmq-plugins enable rabbitmq_management
 rabbitmq-plugins enable rabbitmq_federation
 
-NODE_1=${NODE_1:-"rabbit-1"}
-NODE_2=${NODE_2:-"rabbit-2"}
-NODE_3=${NODE_3:-"rabbit-3"}
+NODE_1=${RABBITMQ_NODE_1_FQDN:-"rabbit-1"}
+NODE_2=${RABBITMQ_NODE_2_FQDN:-"rabbit-2"}
+NODE_3=${RABBITMQ_NODE_3_FQDN:-"rabbit-3"}
 
 # RabbitMQ nodes
 RABBITMQ_NODES=("$NODE_1" "$NODE_2" "$NODE_3")
