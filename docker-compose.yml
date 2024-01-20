@@ -22,14 +22,6 @@ services:
       - "5672:5672"
       - "4369:4369"
       - "25672:25672"
-    resources:
-      limits:
-        cpus: '3'  # Set the number of vCPUs
-        memory: '6G'  # Set the amount of memory
-      reservations: # minimum reservations 
-        cpus: '1'
-        memory: '2G'
-
 networks:
   rabbits:
 
