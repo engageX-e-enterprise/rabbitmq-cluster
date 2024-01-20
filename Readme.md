@@ -18,6 +18,7 @@ The FQDN's are used localy for inter node discovery, as rabbitMQ doesn't enable 
 nano .env 
 ```
 
+
 ## Second step configuring the host machine and prepare the config
 
 Run the script `configure-hosts.sh` as follow.
@@ -31,6 +32,12 @@ The script will use the values provided in the .env files to :
 
 ## The `entrypoint.sh`
 This File is configured as the entry point to the docker image,  used to enable the require plugins, and configure the required ha-policies. 
+
+Change the file permision so it can be executed within the dokcer context.
+
+```
+chmod +x entrypoint.sh
+```
 
 ## run the Node Container.
 To start the container :

@@ -2,15 +2,13 @@ version: '3'
 
 services:
   rabbit:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: rabbitmq-engagex:latest
+    image: rabbitmq:3.8-management
     container_name: rabbit
     hostname: ${CURRENT_NODE_FQDN}
     restart: always
     volumes:
       - ./config/:/config/
+      - ./entrypoint.sh:/usr/local/bin/entrypoint.sh
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - rabbits
@@ -22,6 +20,8 @@ services:
       - "5672:5672"
       - "4369:4369"
       - "25672:25672"
+    entrypoint: /usr/local/bin/entrypoint.sh
+
 networks:
   rabbits:
 
