@@ -6,13 +6,17 @@ The container use mirrored queues and enable the mirroring of the queues.
 
 We will use these values into multiple file , so instead of doing it multiple time in multiple distination we are automating all the process, just put the values here and follow the next steps that will run multiple scripts, to configure the values in their places. 
 
+Create a .evn out of the current `env.example file`:
+```
+cat ./env.example >> .env
+```
+Now you have a new .env file that yopu can use.
 
 The FQDN's are used localy for inter node discovery, as rabbitMQ doesn't enable us tp put the IP address directly.
 
 ```
 nano .env 
 ```
-
 
 ## Second step configuring the host machine and prepare the config
 

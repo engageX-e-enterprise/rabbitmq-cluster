@@ -2,7 +2,10 @@ version: '3'
 
 services:
   rabbit:
-    image: rabbitmq:3.8-management
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rabbitmq-engagex:latest
     container_name: rabbit
     hostname: ${CURRENT_NODE_FQDN}
     restart: always
@@ -21,9 +24,9 @@ services:
       - "25672:25672"
     resources:
       limits:
-        cpus: '4'  # Set the number of vCPUs
-        memory: '8G'  # Set the amount of memory
-      reservations:
+        cpus: '3'  # Set the number of vCPUs
+        memory: '6G'  # Set the amount of memory
+      reservations: # minimum reservations 
         cpus: '1'
         memory: '2G'
 
