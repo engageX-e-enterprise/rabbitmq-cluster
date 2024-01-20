@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  rabbit:
+    image: rabbitmq:3.8-management
+    container_name: rabbit
+    hostname: ${CURRENT_NODE_FQDN}
+    restart: always
+    volumes:
+      - ./config/:/config/
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - rabbits
+    environment:
+      RABBITMQ_CONFIG_FILE: /config/rabbitmq
+      RABBITMQ_ERLANG_COOKIE: ${ERLANG_COOKIE}
+    ports:
+      - "15692:15692" 
+      - "5672:5672"
+      - "4369:4369"
+      - "25672:25672"
+    resources:
+      limits:
+        cpus: '4'  # Set the number of vCPUs
+        memory: '8G'  # Set the amount of memory
+      reservations:
+        cpus: '1'
+        memory: '2G'
+
+networks:
+  rabbits:
+
+volumes:
+  rabbitmq_data:
