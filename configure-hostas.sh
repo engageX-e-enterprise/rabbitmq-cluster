@@ -35,14 +35,14 @@ fi
 line_exists_configured() {
     grep -qF "$1" ./rabbitmq.conf
 }
-if ! line_exists "cluster_formation.classic_config.nodes.1 = rabbit@${RABBITMQ_NODE_1_FQDN}"; then
-    echo "cluster_formation.classic_config.nodes.1 = rabbit@${RABBITMQ_NODE_1_FQDN}" | sudo tee -a /etc/hosts
+if ! line_exists_configured "cluster_formation.classic_config.nodes.1 = rabbit@${RABBITMQ_NODE_1_FQDN}"; then
+    echo "cluster_formation.classic_config.nodes.1 = rabbit@${RABBITMQ_NODE_1_FQDN}" | sudo tee -a ./rabbitmq.conf
 fi
 
-if ! line_exists "cluster_formation.classic_config.nodes.2 = rabbit@${RABBITMQ_NODE_2_FQDN}"; then
-    echo "cluster_formation.classic_config.nodes.2 = rabbit@${RABBITMQ_NODE_2_FQDN}" | sudo tee -a /etc/hosts
+if ! line_exists_configured "cluster_formation.classic_config.nodes.2 = rabbit@${RABBITMQ_NODE_2_FQDN}"; then
+    echo "cluster_formation.classic_config.nodes.2 = rabbit@${RABBITMQ_NODE_2_FQDN}" | sudo tee -a ./rabbitmq.conf
 fi
 
-if ! line_exists "cluster_formation.classic_config.nodes.3 = rabbit@${RABBITMQ_NODE_3_FQDN}"; then
-    echo "cluster_formation.classic_config.nodes.3 = rabbit@${RABBITMQ_NODE_3_FQDN}" | sudo tee -a /etc/hosts
+if ! line_exists_configured "cluster_formation.classic_config.nodes.3 = rabbit@${RABBITMQ_NODE_3_FQDN}"; then
+    echo "cluster_formation.classic_config.nodes.3 = rabbit@${RABBITMQ_NODE_3_FQDN}" | sudo tee -a ./rabbitmq.conf
 fi
