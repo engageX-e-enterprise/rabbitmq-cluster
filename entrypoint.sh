@@ -4,7 +4,7 @@
 rabbitmq-server &
 
 # Wait for RabbitMQ to be ready (adjust the sleep duration based on your system)
-sleep 10
+sleep 100
 
 # Enable RabbitMQ Management and Federation plugins
 rabbitmq-plugins enable rabbitmq_management
