@@ -6,7 +6,6 @@ services:
     restart: always
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-      - ./hosts:/etc/hosts
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - rabbits
