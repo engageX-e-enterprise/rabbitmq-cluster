@@ -1,0 +1,50 @@
+version: '3'
+services:
+  pg:
+    image: bitnami/postgresql-repmgr:14
+    ports:
+      - 5432
+    volumes:
+      - pg_1_data:/bitnami/postgresql
+    restart: always
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+      - POSTGRESQL_USERNAME=customuser
+      - POSTGRESQL_PASSWORD=custompassword
+      - POSTGRESQL_DATABASE=notificationse
+      - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=2
+      - REPMGR_PRIMARY_HOST=db1
+      - REPMGR_PARTNER_NODES=db1,db2,db3
+      - REPMGR_NODE_NAME=pg-1
+      - REPMGR_NODE_NETWORK_NAME=pg-1
+      - REPMGR_USERNAME=repmgr
+      - REPMGR_PASSWORD=repmgrpassword
+
+  pgpool:
+    image: bitnami/pgpool:4
+    ports:
+      - "5433:5432"
+    restart: always
+    environment:
+      - PGPOOL_BACKEND_NODES=0:13.201.87.82:5432,1:43.205.138.177:5432,2:13.235.104.91:5432
+      - PGPOOL_BACKEND_APPLICATION_NAMES=pg-0,pg-1,pg-2
+      - PGPOOL_SR_CHECK_USER=repmgr
+      - PGPOOL_SR_CHECK_PASSWORD=repmgrpassword
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=adminpassword
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=adminpassword
+      - PGPOOL_ENABLE_POOL_HBA=yes
+      - PGPOOL_POSTGRES_USERNAME=customuser
+      - PGPOOL_POSTGRES_PASSWORD=custompassword
+      - PGPOOL_AUTO_FAILBACK=yes
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_1_data:
+    driver: local

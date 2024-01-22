@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  # backend:
+  #   image: deployment-backend:latest
+  #   container_name: backend
+  #   restart: always
+  #   depends_on:
+  #     - pgbouncer
+  #   environment:
+  #     - ASPNETCORE_URLS=http://+:5074
+  #     - ConnectionStrings__Postgres=Server=db;Database=${POSTGRES_DB};Port=5432;User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+  #     - ConnectionStrings__RabbitMQ=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+  #     - ECM_BASEURL=https://smartmessaging.etisalat.ae:5676
+  #     - ECM_SENDERNAME=${ECM_SENDERNAME}
+  #     - ECM_USERNAME=${ECM_USERNAME}
+  #     - ECM_PASSWORD=${ECM_PASSWORD}
+  #     - FAILURE_THRESHOLD=${FAILURE_THRESHOLD}
+  #     - OPEN_DURATION=${OPEN_DURATION}
+  #     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+  #     - JWT_KEY=${JWT_KEY}
+  #     - DEFAULT_ADMIN_USERNAME=${DEFAULT_ADMIN_USERNAME}
+
+  # frontend:
+  #   container_name: frontend
+  #   image: deployment-frontend:latest
+  #   restart: always
+  #   environment:
+  #     NODE_ENV: production
+ 
+  # nginx:
+  #   image: nginx
+  #   container_name: nginx
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - backend
+  #     - frontend
+  #   command: ["nginx -g 'daemon off;'"]
+
+  # otel-collector:
+  #   image: otel/opentelemetry-collector
+  #   ports:
+  #     - "55680:55680"  # gRPC port
+  #     - "55681:55681"  # HTTP port
+  #   volumes:
+  #     - ./otel-collector-config:/etc/otel-collector-config.yaml  # Mount your config file
+  #   restart: always
+
+  haproxy:
+    image: haproxy:latest
+    container_name: haproxy
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    ports:
+      # - "5432:5432"  # Adjust the port if needed for PostgreSQL
+      - "5672:5672"  # RabbitMQ port

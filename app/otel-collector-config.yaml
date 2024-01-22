@@ -1,0 +1,25 @@
+receivers:
+  # Add your receivers configuration for traces, metrics, and logs
+
+exporters:
+  elasticsearch:
+    endpoint: "http://elasticsearch:9200"  # Use the service name in the Docker Compose setup
+    index: "notification-engine"
+    # Additional Elasticsearch exporter configurations if needed
+
+service:
+  pipelines:
+    traces:
+      receivers: [traces-receiver]
+      processors: [traces-processor]
+      exporters: [elasticsearch]
+
+    metrics:
+      receivers: [metrics-receiver]
+      processors: [metrics-processor]
+      exporters: [elasticsearch]
+
+    logs:
+      receivers: [logs-receiver]
+      processors: [logs-processor]
+      exporters: [elasticsearch]
