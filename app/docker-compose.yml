@@ -58,3 +58,23 @@ services:
     ports:
       # - "5432:5432"  # Adjust the port if needed for PostgreSQL
       - "5672:5672"  # RabbitMQ port
+
+  pgpool:
+    image: bitnami/pgpool:latest
+    container_name: pgpool
+    environment:
+      - PGPOOL_BACKEND_NODES=0:10.70.101.176:5432,1:10.70.101.177:5432,2:10.70.101.178:5432
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=adminpassword
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=adminpassword
+      - PGPOOL_ENABLE_POOL_HBA=yes
+      - PGPOOL_AUTO_FAILBACK=yes
+      # Add other necessary Pgpool-II environment variables
+    ports:
+      - "5433:5432"
+    healthcheck:
+        test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+        interval: 10s
+        timeout: 5s
+        retries: 5

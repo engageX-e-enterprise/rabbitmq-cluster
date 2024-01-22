@@ -1,50 +1,35 @@
 version: '3'
 services:
-  pg:
-    image: bitnami/postgresql-repmgr:14
-    ports:
-      - 5432
-    volumes:
-      - pg_0_data:/bitnami/postgresql
-    restart: always
+  pg_primary:
+    image: bitnami/postgresql-repmgr:latest
+    container_name: pg_primary
     environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repmgr
+      - POSTGRESQL_REPLICATION_PASSWORD=repmgrpassword
       - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
       - POSTGRESQL_USERNAME=customuser
       - POSTGRESQL_PASSWORD=custompassword
-      - POSTGRESQL_DATABASE=notificationse
+      - POSTGRESQL_DATABASE=mydatabase
       - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=2
-      - REPMGR_PRIMARY_HOST=db1
-      - REPMGR_PARTNER_NODES=db1,db2,db3
-      - REPMGR_NODE_NAME=pg-0
-      - REPMGR_NODE_NETWORK_NAME=pg-0
+      - REPMGR_PRIMARY_HOST=10.70.101.176
+      - REPMGR_PARTNER_NODES=10.70.101.176:5432,10.70.101.177:5432,10.70.101.178:5432
+      - REPMGR_NODE_NAME=pg_primary
+      - REPMGR_NODE_NETWORK_NAME=pg_primary
       - REPMGR_USERNAME=repmgr
       - REPMGR_PASSWORD=repmgrpassword
-
-  pgpool:
-    image: bitnami/pgpool:4
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    volumes:
+      - pg_primary_data:/bitnami/postgresql
+    networks:
+      - pgpool-network
     restart: always
-    environment:
-      - PGPOOL_BACKEND_NODES=0:13.201.87.82:5432,1:43.205.138.177:5432,2:13.235.104.91:5432
-      - PGPOOL_BACKEND_APPLICATION_NAMES=pg-0,pg-1,pg-2
-      - PGPOOL_SR_CHECK_USER=repmgr
-      - PGPOOL_SR_CHECK_PASSWORD=repmgrpassword
-      - PGPOOL_ENABLE_LDAP=no
-      - PGPOOL_POSTGRES_USERNAME=postgres
-      - PGPOOL_POSTGRES_PASSWORD=adminpassword
-      - PGPOOL_ADMIN_USERNAME=admin
-      - PGPOOL_ADMIN_PASSWORD=adminpassword
-      - PGPOOL_ENABLE_POOL_HBA=yes
-      - PGPOOL_POSTGRES_USERNAME=customuser
-      - PGPOOL_POSTGRES_PASSWORD=custompassword
-      - PGPOOL_AUTO_FAILBACK=yes
-    healthcheck:
-      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+
+networks:
+  pgpool-network:
+    driver: bridge
 
 volumes:
-  pg_0_data:
-    driver: local
+  pg_primary_data:
