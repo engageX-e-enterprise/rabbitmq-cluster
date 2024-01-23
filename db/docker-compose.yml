@@ -1,0 +1,45 @@
+version: "2"
+
+networks:
+    prod:
+        driver: bridge
+
+services:
+    etcd1:
+        image: patroni
+        networks: [ prod ]
+        environment:
+            ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+            ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+            ETCD_INITIAL_CLUSTER: etcd1=http://172.26.0.23:2380,etcd2=http://172.26.0.14:2380,etcd3=http://172.26.6.210:2380
+            ETCD_INITIAL_CLUSTER_STATE: new
+            ETCD_INITIAL_CLUSTER_TOKEN: tutorial
+            ETCD_UNSUPPORTED_ARCH: arm64
+        container_name: prod-etcd1
+        hostname: 172.26.6.210
+        command: etcd --name etcd1 --initial-advertise-peer-urls http://172.26.6.210:2380
+
+    haproxy:
+        image: patroni
+        networks: [ prod ]
+        env_file: docker/patroni.env
+        hostname: haproxy
+        container_name: prod-haproxy
+        ports:
+            - "5000:5000"
+            - "5001:5001"
+        command: haproxy
+        environment: &haproxy_env
+            ETCDCTL_ENDPOINTS: http://172.26.0.23:2379,http://172.26.0.14:2379,http://172.26.6.210:2379
+            PATRONI_ETCD3_HOSTS: "'172.26.0.23:2379','172.26.0.14:2379','172.26.6.210:2379'"
+            PATRONI_SCOPE: prod
+
+    patroni1:
+        image: patroni
+        networks: [ prod ]
+        env_file: docker/patroni.env
+        hostname: patroni1
+        container_name: prod-patroni1
+        environment:
+            <<: *haproxy_env
+            PATRONI_NAME: patroni1
