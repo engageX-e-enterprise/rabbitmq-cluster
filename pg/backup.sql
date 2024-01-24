@@ -1,6 +1,12 @@
 -- Ensure schema
 CREATE SCHEMA IF NOT EXISTS "public";
 
+
+
+INSERT INTO public."_ef_migrations_history" (migration_id,product_version) VALUES
+	 ('20231030110221_matrerialized_views','7.0.5');
+
+
 -- Create table "ad_user"
 CREATE TABLE IF NOT EXISTS "public"."ad_user" (
     "id" TEXT NOT NULL,
