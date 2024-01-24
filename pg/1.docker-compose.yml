@@ -5,7 +5,6 @@ services:
     image: bitnami/postgresql-repmgr:latest
     container_name: pg_standby1
     environment:
-      - POSTGRESQL_REPLICATION_MODE=slave
       - POSTGRESQL_REPLICATION_USER=repmgr
       - POSTGRESQL_REPLICATION_PASSWORD=repmgrpassword
       - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
@@ -15,12 +14,16 @@ services:
       - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=2
       - REPMGR_PRIMARY_HOST=10.70.101.176
       - REPMGR_PARTNER_NODES=10.70.101.176:5432,10.70.101.177:5432,10.70.101.178:5432
-      - REPMGR_NODE_NAME=pg_standby1
-      - REPMGR_NODE_NETWORK_NAME=pg_standby1
+      - REPMGR_NODE_NAME=pg-1
+      - REPMGR_NODE_NETWORK_NAME=10.70.101.177
       - REPMGR_USERNAME=repmgr
       - REPMGR_PASSWORD=repmgrpassword
+      - POSTGRESQL_CLUSTER_APP_NAME=pg-1
     volumes:
       - pg_standby1_data:/bitnami/postgresql
+    ports:
+      - "5432:5432"
+
     networks:
       - pgpool-network
     restart: always

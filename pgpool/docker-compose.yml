@@ -1,0 +1,31 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2.1'
+services:
+  pgpool:
+    image: docker.io/bitnami/pgpool:4
+    container_name: pgpool
+    ports:
+      - 5432:5432
+    environment:
+      - PGPOOL_BACKEND_NODES=0:13.201.87.82:5432,1:43.205.138.177:5432,2:13.235.104.91:5432
+      - PGPOOL_BACKEND_APPLICATION_NAMES=pg-0,pg-1,pg-2
+      - PGPOOL_SR_CHECK_USER=repmgr
+      - PGPOOL_SR_CHECK_PASSWORD=repmgrpassword
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=adminpassword
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=adminpassword
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
+      - PGPOOL_POSTGRES_CUSTOM_USERS=customuser
+      - PGPOOL_POSTGRES_CUSTOM_PASSWORDS=custompassword
+      - PGPOOL_AUTO_FAILBACK=yes
+      - PGPOOL_HEALTH_CHECK_TIMEOUT=4
+      - PGPOOL_HEALTH_CHECK_PSQL_TIMEOUT=4
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

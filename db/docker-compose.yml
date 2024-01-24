@@ -1,45 +1,61 @@
-version: "2"
-
-networks:
-    prod:
-        driver: bridge
-
+version: '2.1'
 services:
-    etcd1:
-        image: patroni
-        networks: [ prod ]
-        environment:
-            ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
-            ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
-            ETCD_INITIAL_CLUSTER: etcd1=http://172.26.0.23:2380,etcd2=http://172.26.0.14:2380,etcd3=http://172.26.6.210:2380
-            ETCD_INITIAL_CLUSTER_STATE: new
-            ETCD_INITIAL_CLUSTER_TOKEN: tutorial
-            ETCD_UNSUPPORTED_ARCH: arm64
-        container_name: prod-etcd1
-        hostname: 172.26.6.210
-        command: etcd --name etcd1 --initial-advertise-peer-urls http://172.26.6.210:2380
-
-    haproxy:
-        image: patroni
-        networks: [ prod ]
-        env_file: docker/patroni.env
-        hostname: haproxy
-        container_name: prod-haproxy
-        ports:
-            - "5000:5000"
-            - "5001:5001"
-        command: haproxy
-        environment: &haproxy_env
-            ETCDCTL_ENDPOINTS: http://172.26.0.23:2379,http://172.26.0.14:2379,http://172.26.6.210:2379
-            PATRONI_ETCD3_HOSTS: "'172.26.0.23:2379','172.26.0.14:2379','172.26.6.210:2379'"
-            PATRONI_SCOPE: prod
-
-    patroni1:
-        image: patroni
-        networks: [ prod ]
-        env_file: docker/patroni.env
-        hostname: patroni1
-        container_name: prod-patroni1
-        environment:
-            <<: *haproxy_env
-            PATRONI_NAME: patroni1
+  pg-0:
+    container_name: pg-0
+    image: docker.io/bitnami/postgresql-repmgr:11
+    volumes:
+      - pg_0_data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+      - POSTGRESQL_USERNAME=customuser
+      - POSTGRESQL_PASSWORD=custompassword
+      - POSTGRESQL_DATABASE=customdatabase
+      - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1
+      - REPMGR_PASSWORD=repmgrpassword
+      - REPMGR_PRIMARY_HOST=pg-0
+      - REPMGR_PARTNER_NODES=pg-0,pg-1
+      - REPMGR_NODE_NAME=pg-0
+      - REPMGR_NODE_NETWORK_NAME=pg-0
+  pg-1:
+    image: docker.io/bitnami/postgresql-repmgr:11
+    container_name: pg-1
+    volumes:
+      - pg_1_data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+      - POSTGRESQL_USERNAME=customuser
+      - POSTGRESQL_PASSWORD=custompassword
+      - POSTGRESQL_DATABASE=customdatabase
+      - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1
+      - REPMGR_PASSWORD=repmgrpassword
+      - REPMGR_PRIMARY_HOST=pg-0
+      - REPMGR_PARTNER_NODES=pg-0,pg-1
+      - REPMGR_NODE_NAME=pg-1
+      - REPMGR_NODE_NETWORK_NAME=pg-1
+  pgpool:
+    image: docker.io/bitnami/pgpool:4
+    container_name: pgpool
+    ports:
+      - 5432:5432
+    environment:
+      - PGPOOL_BACKEND_NODES=0:pg-0:5432,1:pg-1:5432
+      - PGPOOL_BACKEND_APPLICATION_NAMES=pg-0,pg-1
+      - PGPOOL_SR_CHECK_USER=customuser
+      - PGPOOL_SR_CHECK_PASSWORD=custompassword
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=adminpassword
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=adminpassword
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
+      - PGPOOL_AUTO_FAILBACK=yes
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  pg_0_data:
+    driver: local
+  pg_1_data:
+    driver: local
